@@ -1,4 +1,7 @@
 * { box-sizing: border-box; }
+div:focus {
+    outline: none;
+}
 
 html, body {
     margin: 0px;

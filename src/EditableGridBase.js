@@ -70,9 +70,9 @@ export default class EditableGridBase extends Component {
   onKeyUp = e => {
     let { isCellEditable } = this.props;
     let { focusedCol, focusedRow, isEditing } = this.state;
-    if (e.key === "Enter") {
+    if (e.key === "Enter" || (!isEditing && e.key.length === 1)) {
       if (!isEditing && isCellEditable(focusedRow, focusedCol)) {
-        this.startEditing();
+        this.startEditing(e.key.length === 1 ? e.key : null);
       } else if (isEditing) {
         this.stopEditing(true);
       }
@@ -114,7 +114,26 @@ export default class EditableGridBase extends Component {
     });
   };
 
-  onClick = (row, col) => {};
+  onClick = (e, row, column) => {
+    let { isCellEditable, fixedColumnCount, fixedRowCount } = this.props;
+    let { isEditing } = this.state;
+    if (isEditing) {
+      this.stopEditing(true);
+    }
+    let newState = {};
+    if (isCellEditable(row, column)) {
+      newState.isEditing = true;
+      newState.initialValue = null;
+      e.stopPropagation();
+      e.preventDefault();
+    }
+    this.setState({
+      ...this.state,
+      focusedRow: row,
+      focusedCol: column,
+      ...newState
+    });
+  };
 
   /** See Grid#invalidateCellSizeAfterRender */
   invalidateCellSizeAfterRender(
@@ -332,11 +351,12 @@ export default class EditableGridBase extends Component {
     );
   }
 
-  startEditing() {
+  startEditing(initialValue) {
     this.setState(
       {
         ...this.state,
-        isEditing: true
+        isEditing: true,
+        initialValue
       },
       () => {
         //let { focusedCol, focusedRow } = this.state;
@@ -349,12 +369,13 @@ export default class EditableGridBase extends Component {
   }
 
   _cellRenderer({ key, style, ...rest }) {
-    let { focusedCol, focusedRow, isEditing } = this.state;
+    let { focusedCol, focusedRow, isEditing, initialValue } = this.state;
     let { column, row } = rest;
     return (
-      <div key={key} style={style}>
+      <div key={key} style={style} onClick={e => this.onClick(e, row, column)}>
         {this.props.cellRenderer({
           ...rest,
+          initialValue,
           parent: this,
           isEditing: isEditing && focusedCol === column && focusedRow === row,
           onChange: this.onEditorValueChange

@@ -77,7 +77,9 @@ class Input extends React.Component {
   }
 
   componentDidMount() {
-    this.refs.input.focus();
+    setTimeout(() => {
+      this.refs.input.focus();
+    });
   }
 }
 

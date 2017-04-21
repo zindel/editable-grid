@@ -24,7 +24,7 @@ export default class EditableGrid extends React.Component {
   cellRenderer = cellProps => {
     let { data } = this.state;
     let { columns } = this.props;
-    let { row, column, isEditing } = cellProps;
+    let { row, column, isEditing, initialValue, onChange } = cellProps;
     let rowObj = data.get(row);
     if (rowObj === undefined) {
       return <span>&nbsp;</span>;
@@ -32,11 +32,16 @@ export default class EditableGrid extends React.Component {
 
     let id = this.ids[column];
     let value = rowObj.get(id);
+    let editValue = initialValue || value;
     let { renderView, renderEdit } = columns[column];
+    console.log("editValue", editValue);
 
-    return isEditing && renderEdit
-      ? renderEdit({ ...cellProps, value })
-      : renderView({ ...cellProps, value });
+    if (isEditing && renderEdit) {
+      onChange(editValue);
+      return renderEdit({ ...cellProps, value: editValue });
+    } else {
+      return renderView({ ...cellProps, value });
+    }
   };
 
   isCellEditable = (row, column) => {
