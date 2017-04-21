@@ -37,17 +37,19 @@ let columns = [
   {
     id: "type",
     renderView: renderSimple,
+    renderEdit: renderInput,
     width: 150
   },
   {
     id: "required",
     renderView: renderSimple,
+    renderEdit: renderInput,
     width: 150
   }
 ];
 
-function renderInput({value}) {
-  return <Input initialValue={value} />;
+function renderInput({ value, onChange }) {
+  return <Input initialValue={value} onChange={onChange} />;
 }
 
 class Input extends React.Component {
@@ -56,6 +58,12 @@ class Input extends React.Component {
     this.state = { value: props.initialValue };
   }
 
+  onChange = e => {
+    let { onChange } = this.props;
+    let value = e.target.value;
+    this.setState({ value }, () => onChange && onChange(value));
+  };
+
   render() {
     return (
       <input
@@ -63,7 +71,7 @@ class Input extends React.Component {
         type="text"
         style={{ border: "none", height: "100%", width: "100%" }}
         value={this.state.value}
-        onChange={e => this.setState({ value: e.target.value })}
+        onChange={this.onChange}
       />
     );
   }
@@ -83,7 +91,6 @@ class App extends Component {
   }
 
   componentDidMount() {
-    console.log(this._grid);
     setTimeout(() => {
       this._grid.focus();
     });
@@ -95,7 +102,9 @@ class App extends Component {
         <AutoSizer>
           {({ width, height }) => (
             <EditableGrid
-              ref={ref => {this._grid = ref;}}
+              ref={ref => {
+                this._grid = ref;
+              }}
               columns={columns}
               data={data}
               fixedColumnCount={1}

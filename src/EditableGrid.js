@@ -1,4 +1,4 @@
-import React, { PropTypes, Component } from "react";
+import React from "react";
 import { fromJS } from "immutable";
 import EditableGridBase from "./EditableGridBase";
 
@@ -17,7 +17,8 @@ export default class EditableGrid extends React.Component {
       data: fromJS(props.data)
     };
     this.ids = props.columns.map(({ id }) => id);
-    this._grid = null;
+
+    this._grid = null; // we need this to focus properly
   }
 
   cellRenderer = cellProps => {
@@ -38,6 +39,26 @@ export default class EditableGrid extends React.Component {
       : renderView({ ...cellProps, value });
   };
 
+  isCellEditable = (row, column) => {
+    let ret = true;
+    let { columns } = this.props;
+    let { renderEdit } = columns[column];
+    if (renderEdit === undefined) {
+      ret = false;
+    }
+    return ret;
+  };
+
+  onCellValueChange = (row, column, value) => {
+    let { data } = this.state;
+    let rowObj = data.get(row);
+    let id = this.ids[column];
+    this.setState({
+      ...this.state,
+      data: data.set(row, rowObj.set(id, value))
+    });
+  };
+
   render() {
     // TODO: data from state
     let { columns, data, style = {}, ...props } = this.props;
@@ -51,6 +72,8 @@ export default class EditableGrid extends React.Component {
         columnCount={columns.length}
         rowCount={data.length}
         cellRenderer={this.cellRenderer}
+        isCellEditable={this.isCellEditable}
+        onCellValueChange={this.onCellValueChange}
       />
     );
   }
