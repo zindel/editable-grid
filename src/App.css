@@ -23,6 +23,15 @@ html, body {
   height: 100%;
 }
 
+.Grid {
+  height: 50%;
+}
+
+.Input {
+  position: absolute;
+  bottom: 100px;
+}
+
 .focused {
   background: lightblue;
 }

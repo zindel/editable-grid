@@ -48,8 +48,14 @@ let columns = [
   }
 ];
 
-function renderInput({ value, onChange }) {
-  return <Input initialValue={value} onChange={onChange} />;
+function renderInput({ value, onChange, onCompleteEditing }) {
+  return (
+    <Input
+      initialValue={value}
+      onChange={onChange}
+      onCompleteEditing={onCompleteEditing}
+    />
+  );
 }
 
 class Input extends React.Component {
@@ -64,6 +70,11 @@ class Input extends React.Component {
     this.setState({ value }, () => onChange && onChange(value));
   };
 
+  onBlur = () => {
+    let { onCompleteEditing } = this.props;
+    onCompleteEditing && onCompleteEditing();
+  };
+
   render() {
     return (
       <input
@@ -72,6 +83,7 @@ class Input extends React.Component {
         style={{ border: "none", height: "100%", width: "100%" }}
         value={this.state.value}
         onChange={this.onChange}
+        onBlur={this.onBlur}
       />
     );
   }
@@ -101,24 +113,29 @@ class App extends Component {
   render() {
     return (
       <div className="App">
-        <AutoSizer>
-          {({ width, height }) => (
-            <EditableGrid
-              ref={ref => {
-                this._grid = ref;
-              }}
-              columns={columns}
-              data={data}
-              fixedColumnCount={1}
-              fixedRowCount={0}
-              columnWidth={75}
-              columnCount={50}
-              height={height}
-              rowCount={100}
-              width={width}
-            />
-          )}
-        </AutoSizer>
+        <div className="Grid">
+          <AutoSizer>
+            {({ width, height }) => (
+              <EditableGrid
+                ref={ref => {
+                  this._grid = ref;
+                }}
+                columns={columns}
+                data={data}
+                fixedColumnCount={1}
+                fixedRowCount={0}
+                columnWidth={75}
+                columnCount={50}
+                height={300}
+                rowCount={100}
+                width={width}
+              />
+            )}
+          </AutoSizer>
+        </div>
+        <div className="Input">
+          <input type="text" value="test" />
+        </div>
       </div>
     );
   }

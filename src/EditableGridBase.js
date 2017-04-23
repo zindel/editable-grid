@@ -124,8 +124,6 @@ export default class EditableGridBase extends Component {
     if (isCellEditable(row, column)) {
       newState.isEditing = true;
       newState.initialValue = null;
-      e.stopPropagation();
-      e.preventDefault();
     }
     this.setState({
       ...this.state,
@@ -298,6 +296,7 @@ export default class EditableGridBase extends Component {
         tabIndex={0}
         onKeyDown={this.onKeyDown}
         onKeyUp={this.onKeyUp}
+        onFocus={() => {console.log('focused')}}
       >
         <div style={this._containerTopStyle}>
           {this._renderTopLeftGrid(rest)}
@@ -378,7 +377,8 @@ export default class EditableGridBase extends Component {
           initialValue,
           parent: this,
           isEditing: isEditing && focusedCol === column && focusedRow === row,
-          onChange: this.onEditorValueChange
+          onChange: this.onEditorValueChange,
+          //onCompleteEditing: () => {this.stopEditing(true);}
         })}
       </div>
     );
