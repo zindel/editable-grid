@@ -18,15 +18,34 @@ function renderSimple(props) {
   return !props.isEditing ? props.value + "" : renderInput(props);
 }
 
-let data = [
+let _data = [
   { name: "code", type: "integer", required: true },
   { name: "title", type: "text", required: false }
 ];
 
+let data = [];
+
+for (let i = 0; i < 100; i++) {
+  data = [...data, ..._data];
+}
+
 let columns = [
   {
-    id: "-",
-    renderView: props => "Hello"
+    id: "Jo",
+    renderView: props => `Hello ${props.row}`,
+    // renderHeader: () => (
+    //   <div
+    //     style={{
+    //       zIndex: "100",
+    //       overflow: "visible",
+    //       height: "60px",
+    //       width: "90px",
+    //       background: "red"
+    //     }}
+    //   >
+    //     test<br />uou
+    //   </div>
+    // )
   },
   {
     id: "name",
@@ -92,7 +111,12 @@ class Input extends React.Component {
       <input
         ref="input"
         type="text"
-        style={{ border: "none", height: "100%", width: "100%" }}
+        style={{
+          border: "none",
+          height: "100%",
+          width: "100%",
+          outline: "none"
+        }}
         value={this.state.value}
         onChange={this.onChange}
         onBlur={this.onBlur}
@@ -136,18 +160,18 @@ class App extends Component {
                 columns={columns}
                 data={data}
                 fixedColumnCount={1}
-                fixedRowCount={0}
-                columnWidth={75}
+                headerRowCount={1}
+                columnWidth={200}
                 columnCount={50}
                 height={300}
                 rowCount={100}
-                width={width}
+                width={450}
               />
             )}
           </AutoSizer>
         </div>
         <div className="Input">
-          <input type="text" value="test" />
+          <input type="text" />
         </div>
       </div>
     );

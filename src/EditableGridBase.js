@@ -11,12 +11,18 @@ const NORMAL_CELL = {
   borderBottom: "1px solid #ddd"
 };
 const FOCUSED_CELL = {
-  border: "2px solid blue"
+  border: "2px solid blue",
+  zIndex: 100
 };
 
 const DOUBLE_BORDER_RIGHT = { borderRight: "2px solid #ddd" };
 const DOUBLE_BORDER_BOTTOM = { borderBottom: "2px solid #ddd" };
 const HEADER = { fontWeight: "bold" };
+
+const Z_INDEX_TOP_LEFT = {zIndex: 64};
+const Z_INDEX_TOP_RIGHT = {zIndex: 32};
+const Z_INDEX_BOTTOM_LEFT = {zIndex: 16};
+const Z_INDEX_BOTTOM_RIGHT = {zIndex: 8};
 
 /**
  * Renders 1, 2, or 4 Grids depending on configuration.
@@ -58,6 +64,7 @@ export default class EditableGridBase extends Component {
     this._cellRendererBottomRightGrid = this._cellRendererBottomRightGrid.bind(
       this
     );
+    this._cellRendererTopLeftGrid = this._cellRendererTopLeftGrid.bind(this);
     this._cellRendererTopRightGrid = this._cellRendererTopRightGrid.bind(this);
     this._columnWidthRightGrid = this._columnWidthRightGrid.bind(this);
     this._onScroll = this._onScroll.bind(this);
@@ -375,7 +382,7 @@ export default class EditableGridBase extends Component {
           initialValue,
           parent: this,
           isEditing: isEditing && focusedCol === column && focusedRow === row,
-          onSaveChange: (value) => {
+          onSaveChange: value => {
             this.stopEditing(value);
           },
           onCancelChange: () => {
@@ -421,6 +428,16 @@ export default class EditableGridBase extends Component {
     });
   }
 
+  _cellRendererTopLeftGrid({ columnIndex, rowIndex, style, ...rest }) {
+    return this._cellRenderer({
+      ...rest,
+      style: { ...style, ...NORMAL_CELL },
+      column: columnIndex,
+      row: rowIndex,
+      parent: this
+    });
+  }
+
   _cellRendererTopRightGrid({ columnIndex, rowIndex, ...rest }) {
     const {
       columnCount,
@@ -438,8 +455,10 @@ export default class EditableGridBase extends Component {
         />
       );
     } else {
+      let newStyle = { ...rest.style, ...NORMAL_CELL };
       return this._cellRenderer({
         ...rest,
+        style: newStyle,
         column: columnIndex + fixedColumnCount,
         row: rowIndex,
         parent: this
@@ -579,7 +598,8 @@ export default class EditableGridBase extends Component {
 
       this._containerBottomStyle = {
         height: height - this._getTopGridHeight(props),
-        overflow: "hidden",
+        //overflow: "hidden",
+        overflow: "visible",
         position: "relative",
         width
       };
@@ -591,14 +611,17 @@ export default class EditableGridBase extends Component {
         overflowX: "hidden",
         overflowY: "hidden",
         position: "absolute",
-        ...DOUBLE_BORDER_RIGHT
+        ...DOUBLE_BORDER_RIGHT,
+        ...Z_INDEX_BOTTOM_LEFT
       };
     }
 
     if (firstRender || leftSizeChange) {
       this._bottomRightGridStyle = {
         left: this._getLeftGridWidth(props),
-        position: "absolute"
+        position: "absolute",
+        overflow: "hidden",
+        ...Z_INDEX_BOTTOM_RIGHT
       };
     }
 
@@ -611,7 +634,8 @@ export default class EditableGridBase extends Component {
         top: 0,
         ...DOUBLE_BORDER_RIGHT,
         ...DOUBLE_BORDER_BOTTOM,
-        ...HEADER
+        ...HEADER,
+        ...Z_INDEX_TOP_LEFT
       };
     }
 
@@ -623,7 +647,8 @@ export default class EditableGridBase extends Component {
         position: "absolute",
         top: 0,
         ...DOUBLE_BORDER_BOTTOM,
-        ...HEADER
+        ...HEADER,
+        ...Z_INDEX_TOP_RIGHT
       };
     }
   }
@@ -724,6 +749,8 @@ export default class EditableGridBase extends Component {
     return (
       <Grid
         {...props}
+        containerStyle={{overflow: 'visible'}}
+        cellRenderer={this._cellRendererTopLeftGrid}
         columnCount={fixedColumnCount}
         height={this._getTopGridHeight(props)}
         ref={ref => {
@@ -748,6 +775,8 @@ export default class EditableGridBase extends Component {
     if (!fixedRowCount) {
       return null;
     }
+
+    console.log('scrollLeft', scrollLeft);
 
     return (
       <Grid
@@ -790,5 +819,4 @@ export default class EditableGridBase extends Component {
   focus() {
     this._refContainer && this._refContainer.focus();
   }
-
 }
