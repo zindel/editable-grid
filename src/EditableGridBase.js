@@ -690,8 +690,8 @@ export default class EditableGridBase extends Component {
         }}
         onScroll={this._onScroll}
         rowCount={
-          Math.max(0, rowCount - fixedRowCount) +
-            1 /* See _rowHeightBottomGrid */
+          Math.max(0, rowCount - fixedRowCount) + 0
+          /*  1  See _rowHeightBottomGrid */
         }
         rowHeight={this._rowHeightBottomGrid}
         scrollTop={scrollTop}
@@ -805,9 +805,9 @@ export default class EditableGridBase extends Component {
     // This gives the smaller Grid extra room for offset,
     // In case the main (bottom right) Grid has a scrollbar
     // If no scrollbar, the extra space is overflow:hidden anyway
-    if (index === rowCount - fixedRowCount) {
-      return SCROLLBAR_SIZE_BUFFER;
-    }
+    // if (index === rowCount - fixedRowCount) {
+    //   return SCROLLBAR_SIZE_BUFFER;
+    // }
 
     return typeof rowHeight === "function"
       ? rowHeight({ index: index + fixedRowCount })

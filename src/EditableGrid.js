@@ -18,7 +18,8 @@ function renderHeaderDefault(cellProps) {
 export default class EditableGrid extends React.Component {
   static defaultProps = {
     rowHeight: 25,
-    headerRowCount: 1
+    headerRowCount: 1,
+    newRowTemplateFunc: null
   };
 
   constructor(props) {
@@ -34,7 +35,7 @@ export default class EditableGrid extends React.Component {
   cellRenderer = cellProps => {
     let { data } = this.state;
     let { headerRowCount, columns } = this.props;
-    let { row, column, isEditing, initialValue, onChange } = cellProps;
+    let { row, column, isEditing, initialValue } = cellProps;
 
     if (row < headerRowCount) {
       let columnObj = columns[column];
@@ -46,12 +47,13 @@ export default class EditableGrid extends React.Component {
     } else {
       // render value
       let rowObj = data.get(row - headerRowCount);
-      if (rowObj === undefined) {
-        return <div style={{}} key={`${row}-${column}`}>&nbsp;</div>;
-      }
+      // if (rowObj === undefined) {
+      //   let key = `${row}-${column}`;
+      //   return <div style={{}} key={key}>&nbsp;</div>;
+      // }
 
       let id = this.ids[column];
-      let value = rowObj.get(id);
+      let value = rowObj === undefined ? "" : rowObj.get(id);
       let editValue = initialValue || value;
       let { renderView, renderEdit } = columns[column];
 
@@ -65,15 +67,22 @@ export default class EditableGrid extends React.Component {
 
   isCellEditable = (row, column) => {
     let { headerRowCount, columns } = this.props;
-    return row >= headerRowCount && columns[column].renderEdit !== undefined;
+    let ret = row >= headerRowCount && columns[column].renderEdit !== undefined;
+    return ret;
   };
 
   onCellValueChange = (row, column, value) => {
-    let { headerRowCount } = this.props;
+    let { headerRowCount, newRowTemplateFunc } = this.props;
     let { data } = this.state;
     row -= headerRowCount;
     let rowObj = data.get(row);
     let id = this.ids[column];
+
+    // for now always insert new row to the end
+    if (rowObj === undefined && data.size === row && newRowTemplateFunc) {
+      rowObj = fromJS(newRowTemplateFunc());
+      data = data.push(rowObj);
+    }
     this.setState({
       ...this.state,
       data: data.set(row, rowObj.set(id, value))
@@ -82,6 +91,7 @@ export default class EditableGrid extends React.Component {
 
   render() {
     let {
+      newRowTemplateFunc,
       headerRowCount,
       columns,
       data: initialData,
@@ -89,7 +99,9 @@ export default class EditableGrid extends React.Component {
       ...props
     } = this.props;
     let { data } = this.state;
-    let rowCount = (data ? data.size : initialData.length) + headerRowCount;
+    let rowCount = (data ? data.size : initialData.length) +
+      headerRowCount +
+      (newRowTemplateFunc ? 1 : 0);
     return (
       <EditableGridBase
         {...props}

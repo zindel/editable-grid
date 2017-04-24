@@ -31,6 +31,8 @@ for (let i = 0; i < 10; i++) {
   data = [...data, ..._data];
 }
 
+let newRowTemplateFunc = () => ({name: '', type: '', required: false});
+
 let columns = [
   {
     id: "Jo",
@@ -187,6 +189,7 @@ class Input extends React.Component {
 
   componentDidMount() {
     setTimeout(() => {
+      this.refs.input.value = this.state.value;
       this.refs.input.focus();
     });
   }
@@ -218,6 +221,7 @@ class App extends Component {
                   this._grid = ref;
                 }}
                 columns={columns}
+                newRowTemplateFunc={newRowTemplateFunc}
                 data={data}
                 fixedColumnCount={2}
                 headerRowCount={1}
@@ -226,6 +230,7 @@ class App extends Component {
                 height={300}
                 rowCount={100}
                 width={650}
+
               />
             )}
           </AutoSizer>
