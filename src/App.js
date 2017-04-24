@@ -5,20 +5,6 @@ import EditableGrid from "./EditableGrid";
 import Autocomplete from "@prometheusresearch/react-autocomplete";
 import "./App.css";
 
-/*
- *  TODO:
- *  1. Fetch JSON (+)
- *  2. Handle the keyboard event and focused cell (+)
- *  3. Render the own JSON in the example grid
- *  4. Render editor box
- *  5. Try the keyboard functionality (+)
- *
- *
- */
-
-function renderSimple(props) {
-  return !props.isEditing ? props.value + "" : renderInput(props);
-}
 
 let _data = [
   { name: "code", type: "integer", required: true },
@@ -27,7 +13,7 @@ let _data = [
 
 let data = [];
 
-for (let i = 0; i < 10; i++) {
+for (let i = 0; i < 1; i++) {
   data = [...data, ..._data];
 }
 
@@ -225,12 +211,9 @@ class App extends Component {
                 data={data}
                 fixedColumnCount={2}
                 headerRowCount={1}
-                columnWidth={200}
-                columnCount={50}
-                height={300}
-                rowCount={100}
-                width={650}
-
+                autoGrowMaxRows={5}
+                height={height}
+                width={width}
               />
             )}
           </AutoSizer>

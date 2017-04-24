@@ -19,7 +19,8 @@ export default class EditableGrid extends React.Component {
   static defaultProps = {
     rowHeight: 25,
     headerRowCount: 1,
-    newRowTemplateFunc: null
+    newRowTemplateFunc: null,
+    autoGrowMaxRows: null,
   };
 
   constructor(props) {
@@ -96,21 +97,32 @@ export default class EditableGrid extends React.Component {
       columns,
       data: initialData,
       style = {},
-      ...props
+      fixedColumnCount,
+      autoGrowMaxRows,
+      rowHeight,
+      height,
+      width
     } = this.props;
     let { data } = this.state;
     let rowCount = (data ? data.size : initialData.length) +
       headerRowCount +
       (newRowTemplateFunc ? 1 : 0);
+    if (autoGrowMaxRows) {
+      height = Math.min(autoGrowMaxRows * rowHeight, rowCount * rowHeight);
+    }
     return (
       <EditableGridBase
-        {...props}
         ref={ref => {
           this._grid = ref;
         }}
+        height={height}
+        width={width}
         style={{ ...STYLE, ...style }}
         fixedRowCount={headerRowCount}
+        fixedColumnCount={fixedColumnCount}
+        columnWidth={200}
         columnCount={columns.length}
+        rowHeight={rowHeight}
         rowCount={rowCount}
         cellRenderer={this.cellRenderer}
         isCellEditable={this.isCellEditable}

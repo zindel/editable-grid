@@ -1,7 +1,6 @@
 
 TODO:
 
-- decide what to do with height calculation
 - column widths
 - refactor editors
 - decide on column state - where is it kept
@@ -19,5 +18,6 @@ DONE:
 - handle header rows
 - add Autocomplete editor
 - handle add new row
+- decide what to do with height calculation
 
 
