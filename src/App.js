@@ -48,12 +48,12 @@ let columns = [
   }
 ];
 
-function renderInput({ value, onChange, onCompleteEditing }) {
+function renderInput({ value, onSaveChange, onCancelChange }) {
   return (
     <Input
       initialValue={value}
-      onChange={onChange}
-      onCompleteEditing={onCompleteEditing}
+      onSaveChange={onSaveChange}
+      onCancelChange={onCancelChange}
     />
   );
 }
@@ -71,8 +71,20 @@ class Input extends React.Component {
   };
 
   onBlur = () => {
-    let { onCompleteEditing } = this.props;
-    onCompleteEditing && onCompleteEditing();
+    let { onSaveChange } = this.props;
+    onSaveChange && onSaveChange(this.state.value);
+  };
+
+  onKeyUp = e => {
+    let { onSaveChange, onCancelChange } = this.props;
+    if (e.key === "Enter") {
+      onSaveChange && onSaveChange(this.state.value);
+    } else if (e.key === "Escape") {
+      this.setState(
+        { value: undefined },
+        () => onCancelChange && onCancelChange()
+      );
+    }
   };
 
   render() {
@@ -84,6 +96,7 @@ class Input extends React.Component {
         value={this.state.value}
         onChange={this.onChange}
         onBlur={this.onBlur}
+        onKeyUp={this.onKeyUp}
       />
     );
   }

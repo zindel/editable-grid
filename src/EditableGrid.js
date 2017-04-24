@@ -36,7 +36,7 @@ export default class EditableGrid extends React.Component {
     let { renderView, renderEdit } = columns[column];
 
     if (isEditing && renderEdit) {
-      onChange(editValue);
+      //onChange(editValue);
       return renderEdit({ ...cellProps, value: editValue });
     } else {
       return renderView({ ...cellProps, value });

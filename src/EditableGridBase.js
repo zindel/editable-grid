@@ -62,22 +62,21 @@ export default class EditableGridBase extends Component {
     this._columnWidthRightGrid = this._columnWidthRightGrid.bind(this);
     this._onScroll = this._onScroll.bind(this);
     this._rowHeightBottomGrid = this._rowHeightBottomGrid.bind(this);
-
-    // last edited value
-    this._lastValue = "";
   }
 
   onKeyUp = e => {
     let { isCellEditable } = this.props;
     let { focusedCol, focusedRow, isEditing } = this.state;
-    if (e.key === "Enter" || (!isEditing && e.key.length === 1)) {
-      if (!isEditing && isCellEditable(focusedRow, focusedCol)) {
-        this.startEditing(e.key.length === 1 ? e.key : null);
-      } else if (isEditing) {
-        this.stopEditing(true);
-      }
-    } else if (e.key === "Escape" && isEditing) {
-      this.stopEditing(false);
+
+    if (isEditing) {
+      return;
+    }
+
+    if (
+      (e.key === "Enter" || e.key.length === 1) &&
+      isCellEditable(focusedRow, focusedCol)
+    ) {
+      this.startEditing(e.key.length === 1 ? e.key : null);
     }
   };
 
@@ -117,9 +116,9 @@ export default class EditableGridBase extends Component {
   onClick = (e, row, column) => {
     let { isCellEditable, fixedColumnCount, fixedRowCount } = this.props;
     let { isEditing } = this.state;
-    if (isEditing) {
+    /*if (isEditing) {
       this.stopEditing(true);
-    }
+    }*/
     let newState = {};
     if (isCellEditable(row, column)) {
       newState.isEditing = true;
@@ -296,7 +295,6 @@ export default class EditableGridBase extends Component {
         tabIndex={0}
         onKeyDown={this.onKeyDown}
         onKeyUp={this.onKeyUp}
-        onFocus={() => {console.log('focused')}}
       >
         <div style={this._containerTopStyle}>
           {this._renderTopLeftGrid(rest)}
@@ -327,11 +325,11 @@ export default class EditableGridBase extends Component {
     );
   }
 
-  stopEditing(saveValue) {
+  stopEditing(value) {
     let { onCellValueChange } = this.props;
-    if (saveValue && onCellValueChange) {
+    if (onCellValueChange && value !== undefined) {
       let { focusedCol, focusedRow } = this.state;
-      onCellValueChange(focusedRow, focusedCol, this._lastValue);
+      onCellValueChange(focusedRow, focusedCol, value);
     }
 
     this.setState(
@@ -377,8 +375,12 @@ export default class EditableGridBase extends Component {
           initialValue,
           parent: this,
           isEditing: isEditing && focusedCol === column && focusedRow === row,
-          onChange: this.onEditorValueChange,
-          //onCompleteEditing: () => {this.stopEditing(true);}
+          onSaveChange: (value) => {
+            this.stopEditing(value);
+          },
+          onCancelChange: () => {
+            this.stopEditing();
+          }
         })}
       </div>
     );
@@ -789,7 +791,4 @@ export default class EditableGridBase extends Component {
     this._refContainer && this._refContainer.focus();
   }
 
-  onEditorValueChange = value => {
-    this._lastValue = value;
-  };
 }
