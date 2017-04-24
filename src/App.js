@@ -1,6 +1,8 @@
 import React, { Component } from "react";
+import ReactDOM from "react-dom";
 import { AutoSizer } from "react-virtualized";
 import EditableGrid from "./EditableGrid";
+import Autocomplete from "@prometheusresearch/react-autocomplete";
 import "./App.css";
 
 /*
@@ -25,14 +27,14 @@ let _data = [
 
 let data = [];
 
-for (let i = 0; i < 100; i++) {
+for (let i = 0; i < 10; i++) {
   data = [...data, ..._data];
 }
 
 let columns = [
   {
     id: "Jo",
-    renderView: props => `Hello ${props.row}`,
+    renderView: props => `Hello ${props.row}`
     // renderHeader: () => (
     //   <div
     //     style={{
@@ -55,17 +57,75 @@ let columns = [
   },
   {
     id: "type",
-    renderView: renderSimple,
-    renderEdit: renderInput,
+    renderView: ({ value }) => value + "",
+    renderEdit: renderAutocomplete,
     width: 150
   },
   {
     id: "required",
-    renderView: renderSimple,
+    renderView: ({ value }) => value + "",
     renderEdit: renderInput,
     width: 150
   }
 ];
+
+function renderAutocomplete({ value, onSaveChange, onCancelChange }) {
+  return (
+    <AutocompleteEditor
+      initialValue={value}
+      onSaveChange={onSaveChange}
+      onCancelChange={onCancelChange}
+    />
+  );
+}
+class AutocompleteEditor extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { value: props.initialValue };
+  }
+
+  onKeyUp = e => {
+    if (e.key === "Enter") {
+      e.stopPropagation();
+      e.preventDefault();
+    } else if (e.key === "Escape") {
+      this.props.onCancelChange();
+    }
+  };
+
+  onChange = v => {
+    if (v !== null && v !== undefined) {
+      setTimeout(() => this.props.onSaveChange(v.id), 100);
+    } else {
+      // TODO: check if the current search term matches the option
+      // if not cancel change
+    }
+  };
+
+  render() {
+    let { initialValue } = this.props;
+    return (
+      <Autocomplete
+        ref="input"
+        searchTerm={
+          initialValue && initialValue.length === 1 ? initialValue : ""
+        }
+        options={[
+          { id: "text", title: "text" },
+          { id: "integer", title: "integer" }
+        ]}
+        onChange={this.onChange}
+        onKeyUp={this.onKeyUp}
+      />
+    );
+  }
+
+  componentDidMount() {
+    setTimeout(() => {
+      ReactDOM.findDOMNode(this.refs.input).children[0].focus();
+    });
+  }
+}
 
 function renderInput({ value, onSaveChange, onCancelChange }) {
   return (
@@ -159,13 +219,13 @@ class App extends Component {
                 }}
                 columns={columns}
                 data={data}
-                fixedColumnCount={1}
+                fixedColumnCount={2}
                 headerRowCount={1}
                 columnWidth={200}
                 columnCount={50}
                 height={300}
                 rowCount={100}
-                width={450}
+                width={650}
               />
             )}
           </AutoSizer>

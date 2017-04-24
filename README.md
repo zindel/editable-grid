@@ -2,17 +2,20 @@
 TODO:
 
 - handle add new row
-- add Autocomplete editor
-- add Checkbox editor (?)
 - decide what to do with height calculation
 - decide on extra row
 - column widths
-- decouple input editor
+- refactor editors
 - decide on column state - where is it kept
+- style Autocomplete properly
+
+WISHLIST:
+- add Checkbox editor (?)
 
 
 DONE:
 - change the editor API to handle onBlur properly
 - handle header rows
+- add Autocomplete editor
 
 

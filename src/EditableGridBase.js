@@ -19,10 +19,10 @@ const DOUBLE_BORDER_RIGHT = { borderRight: "2px solid #ddd" };
 const DOUBLE_BORDER_BOTTOM = { borderBottom: "2px solid #ddd" };
 const HEADER = { fontWeight: "bold" };
 
-const Z_INDEX_TOP_LEFT = {zIndex: 64};
-const Z_INDEX_TOP_RIGHT = {zIndex: 32};
-const Z_INDEX_BOTTOM_LEFT = {zIndex: 16};
-const Z_INDEX_BOTTOM_RIGHT = {zIndex: 8};
+const Z_INDEX_TOP_LEFT = { zIndex: 64 };
+const Z_INDEX_TOP_RIGHT = { zIndex: 32 };
+const Z_INDEX_BOTTOM_LEFT = { zIndex: 16 };
+const Z_INDEX_BOTTOM_RIGHT = { zIndex: 8 };
 
 /**
  * Renders 1, 2, or 4 Grids depending on configuration.
@@ -749,7 +749,7 @@ export default class EditableGridBase extends Component {
     return (
       <Grid
         {...props}
-        containerStyle={{overflow: 'visible'}}
+        containerStyle={{ overflow: "visible" }}
         cellRenderer={this._cellRendererTopLeftGrid}
         columnCount={fixedColumnCount}
         height={this._getTopGridHeight(props)}
@@ -775,8 +775,6 @@ export default class EditableGridBase extends Component {
     if (!fixedRowCount) {
       return null;
     }
-
-    console.log('scrollLeft', scrollLeft);
 
     return (
       <Grid
