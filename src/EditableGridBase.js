@@ -11,8 +11,14 @@ const NORMAL_CELL = {
   borderBottom: "1px solid #ddd"
 };
 const FOCUSED_CELL = {
-  border: "2px solid blue",
-  zIndex: 100
+  outline: "2px solid blue"
+  // overflow: 'visible',
+  // border: "2px solid blue",
+  // borderRight: "2px solid blue",
+  // borderLeft: "2px solid blue",
+  // borderTop: "2px solid blue",
+  // borderBottom: "2px solid blue",
+  // zIndex: 100
 };
 
 const DOUBLE_BORDER_RIGHT = { borderRight: "2px solid #ddd" };
@@ -90,9 +96,17 @@ export default class EditableGridBase extends Component {
   onKeyDown = e => {
     let incRow = 0, incCol = 0;
     let { focusedCol, focusedRow, isEditing } = this.state;
-    let { fixedRowCount, columnCount, rowCount } = this.props;
+    let { isCellEditable, fixedRowCount, columnCount, rowCount } = this.props;
 
     if (isEditing) {
+      return;
+    }
+
+    if (
+      (e.key === "Enter" || e.key.length === 1) &&
+      isCellEditable(focusedRow, focusedCol)
+    ) {
+      this.startEditing(e.key.length === 1 ? e.key : null);
       return;
     }
 
@@ -121,11 +135,7 @@ export default class EditableGridBase extends Component {
   };
 
   onClick = (e, row, column) => {
-    let { isCellEditable, fixedColumnCount, fixedRowCount } = this.props;
-    let { isEditing } = this.state;
-    /*if (isEditing) {
-      this.stopEditing(true);
-    }*/
+    let { isCellEditable } = this.props;
     let newState = {};
     if (isCellEditable(row, column)) {
       newState.isEditing = true;
@@ -301,7 +311,6 @@ export default class EditableGridBase extends Component {
         }}
         tabIndex={0}
         onKeyDown={this.onKeyDown}
-        onKeyUp={this.onKeyUp}
       >
         <div style={this._containerTopStyle}>
           {this._renderTopLeftGrid(rest)}
@@ -372,66 +381,76 @@ export default class EditableGridBase extends Component {
     );
   }
 
-  _cellRenderer({ key, style, ...rest }) {
+  _cellRenderer({ key, style, focused, ...rest }) {
     let { focusedCol, focusedRow, isEditing, initialValue } = this.state;
     let { column, row } = rest;
+    let children = this.props.cellRenderer({
+      ...rest,
+      initialValue,
+      parent: this,
+      isEditing: isEditing && focused,
+      focused,
+      onSaveChange: value => {
+        this.stopEditing(value);
+      },
+      onCancelChange: () => {
+        this.stopEditing();
+      }
+    });
+    // if (focused) {
+    //   children = (
+    //     <div style={{ width: "100%", height: "100%", ...FOCUSED_CELL }}>
+    //       {children}
+    //     </div>
+    //   );
+    // }
     return (
-      <div key={key} style={style} onClick={e => this.onClick(e, row, column)}>
-        {this.props.cellRenderer({
-          ...rest,
-          initialValue,
-          parent: this,
-          isEditing: isEditing && focusedCol === column && focusedRow === row,
-          onSaveChange: value => {
-            this.stopEditing(value);
-          },
-          onCancelChange: () => {
-            this.stopEditing();
-          }
-        })}
+      <div
+        key={key}
+        style={{ ...style, ...(focused ? FOCUSED_CELL : NORMAL_CELL) }}
+        onClick={e => this.onClick(e, row, column)}
+      >
+        {children}
       </div>
     );
   }
 
-  _cellRendererBottomLeftGrid({ columnIndex, rowIndex, style, ...rest }) {
+  _cellRendererBottomLeftGrid({ columnIndex, rowIndex, ...rest }) {
     const { fixedRowCount } = this.props;
     let { focusedCol, focusedRow } = this.state;
 
     let focused = focusedCol === columnIndex &&
       focusedRow - fixedRowCount === rowIndex;
-    let newStyle = { ...style, ...(focused ? FOCUSED_CELL : NORMAL_CELL) };
 
     return this._cellRenderer({
       ...rest,
-      style: newStyle,
+      focused,
       parent: this,
       column: columnIndex,
       row: rowIndex + fixedRowCount
     });
   }
 
-  _cellRendererBottomRightGrid({ columnIndex, rowIndex, style, ...rest }) {
+  _cellRendererBottomRightGrid({ columnIndex, rowIndex, ...rest }) {
     const { fixedColumnCount, fixedRowCount } = this.props;
 
     let { focusedCol, focusedRow } = this.state;
 
     let focused = focusedCol - fixedColumnCount === columnIndex &&
       focusedRow - fixedRowCount === rowIndex;
-    let newStyle = { ...style, ...(focused ? FOCUSED_CELL : NORMAL_CELL) };
 
     return this._cellRenderer({
       ...rest,
-      style: newStyle,
+      focused,
       parent: this,
       column: columnIndex + fixedColumnCount,
       row: rowIndex + fixedRowCount
     });
   }
 
-  _cellRendererTopLeftGrid({ columnIndex, rowIndex, style, ...rest }) {
+  _cellRendererTopLeftGrid({ columnIndex, rowIndex, ...rest }) {
     return this._cellRenderer({
       ...rest,
-      style: { ...style, ...NORMAL_CELL },
       column: columnIndex,
       row: rowIndex,
       parent: this
@@ -455,10 +474,8 @@ export default class EditableGridBase extends Component {
         />
       );
     } else {
-      let newStyle = { ...rest.style, ...NORMAL_CELL };
       return this._cellRenderer({
         ...rest,
-        style: newStyle,
         column: columnIndex + fixedColumnCount,
         row: rowIndex,
         parent: this
@@ -609,7 +626,7 @@ export default class EditableGridBase extends Component {
       this._styleBottomLeft = {
         left: 0,
         overflowX: "hidden",
-        overflowY: "hidden",
+        // overflowY: "hidden",
         position: "absolute",
         ...DOUBLE_BORDER_RIGHT,
         ...Z_INDEX_BOTTOM_LEFT
@@ -620,7 +637,7 @@ export default class EditableGridBase extends Component {
       this._bottomRightGridStyle = {
         left: this._getLeftGridWidth(props),
         position: "absolute",
-        overflow: "hidden",
+        // overflow: "hidden",
         ...Z_INDEX_BOTTOM_RIGHT
       };
     }
@@ -690,7 +707,7 @@ export default class EditableGridBase extends Component {
         }}
         onScroll={this._onScroll}
         rowCount={
-          Math.max(0, rowCount - fixedRowCount) + 0
+          Math.max(0, rowCount - fixedRowCount) + 1
           /*  1  See _rowHeightBottomGrid */
         }
         rowHeight={this._rowHeightBottomGrid}
@@ -799,7 +816,7 @@ export default class EditableGridBase extends Component {
   }
 
   _rowHeightBottomGrid({ index }) {
-    const { fixedRowCount, rowCount, rowHeight } = this.props;
+    const { fixedRowCount, rowHeight } = this.props;
 
     // An extra cell is added to the count
     // This gives the smaller Grid extra room for offset,

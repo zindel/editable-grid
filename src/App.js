@@ -12,7 +12,7 @@ let _data = [
 
 let data = [];
 
-for (let i = 0; i < 1; i++) {
+for (let i = 0; i < 10; i++) {
   data = [...data, ..._data];
 }
 
@@ -43,13 +43,15 @@ let columns = [
   }
 ];
 
-function renderAutocomplete({ value, onSaveChange, onCancelChange }) {
+function renderInput(
+  {
+    value,
+    onSaveChange,
+    onCancelChange
+  }
+) {
   return (
-    <AutocompleteEditor
-      options={[
-        { id: "text", title: "text" },
-        { id: "integer", title: "integer" }
-      ]}
+    <InputEditor
       initialValue={value}
       onSaveChange={onSaveChange}
       onCancelChange={onCancelChange}
@@ -57,9 +59,13 @@ function renderAutocomplete({ value, onSaveChange, onCancelChange }) {
   );
 }
 
-function renderInput({ value, onSaveChange, onCancelChange }) {
+function renderAutocomplete({ value, onSaveChange, onCancelChange }) {
   return (
-    <InputEditor
+    <AutocompleteEditor
+      options={[
+        { id: "text", title: "text" },
+        { id: "integer", title: "integer" }
+      ]}
       initialValue={value}
       onSaveChange={onSaveChange}
       onCancelChange={onCancelChange}
@@ -87,21 +93,22 @@ class App extends Component {
       <div className="App">
         <div className="Grid">
           <AutoSizer>
-            {({ width, height }) => (
-              <EditableGrid
-                ref={ref => {
-                  this._grid = ref;
-                }}
-                columns={columns}
-                newRowTemplateFunc={newRowTemplateFunc}
-                data={data}
-                fixedColumnCount={2}
-                headerRowCount={1}
-                autoGrowMaxRows={5}
-                height={height}
-                width={width}
-              />
-            )}
+            {({ width, height }) => {
+              return (
+                <EditableGrid
+                  ref={ref => {
+                    this._grid = ref;
+                  }}
+                  columns={columns}
+                  newRowTemplateFunc={newRowTemplateFunc}
+                  data={data}
+                  fixedColumnCount={2}
+                  headerRowCount={1}
+                  height={height}
+                  width={width}
+                />
+              );
+            }}
           </AutoSizer>
         </div>
         <div className="Input">

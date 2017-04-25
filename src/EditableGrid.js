@@ -3,7 +3,7 @@ import { fromJS } from "immutable";
 import EditableGridBase from "./EditableGridBase";
 
 const STYLE = {
-  border: "2px solid #ddd"
+  border: "0px solid #ddd"
 };
 
 function renderHeaderDefault(cellProps) {

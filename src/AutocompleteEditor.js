@@ -12,18 +12,15 @@ export default class AutocompleteEditor extends React.Component {
     this.state = { value: props.initialValue };
   }
 
-  onKeyUp = e => {
-    if (e.key === "Enter") {
-      e.stopPropagation();
-      e.preventDefault();
-    } else if (e.key === "Escape") {
+  onKeyDown = e => {
+    if (e.key === "Escape") {
       this.props.onCancelChange();
     }
   };
 
   onChange = v => {
     if (v !== null && v !== undefined) {
-      setTimeout(() => this.props.onSaveChange(v.id), 100);
+      setTimeout(() => this.props.onSaveChange(v.id));
     } else {
       // TODO: check if the current search term matches the option
       // if not cancel change
@@ -31,8 +28,7 @@ export default class AutocompleteEditor extends React.Component {
   };
 
   render() {
-    let { initialValue } = this.props;
-    let { options } = this.props;
+    let { initialValue, options } = this.props;
     return (
       <Autocomplete
         ref="input"
@@ -41,7 +37,7 @@ export default class AutocompleteEditor extends React.Component {
         }
         options={options}
         onChange={this.onChange}
-        onKeyUp={this.onKeyUp}
+        onKeyDown={this.onKeyDown}
       />
     );
   }

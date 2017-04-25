@@ -11,7 +11,7 @@ export default class InputEditor extends React.Component {
     onSaveChange && onSaveChange(this.state.value);
   };
 
-  onKeyUp = e => {
+  onKeyDown = e => {
     let { onSaveChange, onCancelChange } = this.props;
     if (e.key === "Enter") {
       onSaveChange && onSaveChange(this.state.value);
@@ -37,7 +37,7 @@ export default class InputEditor extends React.Component {
         value={this.state.value}
         onChange={e => this.setState({ value: e.target.value })}
         onBlur={this.onBlur}
-        onKeyUp={this.onKeyUp}
+        onKeyDown={this.onKeyDown}
       />
     );
   }
