@@ -1,16 +1,16 @@
 
 TODO:
 
+- make focused border look better
 - column widths
-- refactor editors
 - decide on column state - where is it kept
 - style Autocomplete properly
-- maybe make row template static?
-- make focused border look better
+- decide where static/numeric columns are managed
 
 WISHLIST:
 - add Checkbox editor (?)
 - decide on extra row
+- maybe make row template static?
 
 
 DONE:
@@ -19,5 +19,6 @@ DONE:
 - add Autocomplete editor
 - handle add new row
 - decide what to do with height calculation
+- refactor editors
 
 

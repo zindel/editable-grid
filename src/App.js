@@ -1,10 +1,9 @@
 import React, { Component } from "react";
-import ReactDOM from "react-dom";
 import { AutoSizer } from "react-virtualized";
 import EditableGrid from "./EditableGrid";
-import Autocomplete from "@prometheusresearch/react-autocomplete";
+import InputEditor from "./InputEditor";
+import AutocompleteEditor from "./AutocompleteEditor";
 import "./App.css";
-
 
 let _data = [
   { name: "code", type: "integer", required: true },
@@ -17,25 +16,12 @@ for (let i = 0; i < 1; i++) {
   data = [...data, ..._data];
 }
 
-let newRowTemplateFunc = () => ({name: '', type: '', required: false});
+let newRowTemplateFunc = () => ({ name: "", type: "", required: false });
 
 let columns = [
   {
     id: "Jo",
     renderView: props => `Hello ${props.row}`
-    // renderHeader: () => (
-    //   <div
-    //     style={{
-    //       zIndex: "100",
-    //       overflow: "visible",
-    //       height: "60px",
-    //       width: "90px",
-    //       background: "red"
-    //     }}
-    //   >
-    //     test<br />uou
-    //   </div>
-    // )
   },
   {
     id: "name",
@@ -60,125 +46,25 @@ let columns = [
 function renderAutocomplete({ value, onSaveChange, onCancelChange }) {
   return (
     <AutocompleteEditor
+      options={[
+        { id: "text", title: "text" },
+        { id: "integer", title: "integer" }
+      ]}
       initialValue={value}
       onSaveChange={onSaveChange}
       onCancelChange={onCancelChange}
     />
   );
-}
-class AutocompleteEditor extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { value: props.initialValue };
-  }
-
-  onKeyUp = e => {
-    if (e.key === "Enter") {
-      e.stopPropagation();
-      e.preventDefault();
-    } else if (e.key === "Escape") {
-      this.props.onCancelChange();
-    }
-  };
-
-  onChange = v => {
-    if (v !== null && v !== undefined) {
-      setTimeout(() => this.props.onSaveChange(v.id), 100);
-    } else {
-      // TODO: check if the current search term matches the option
-      // if not cancel change
-    }
-  };
-
-  render() {
-    let { initialValue } = this.props;
-    return (
-      <Autocomplete
-        ref="input"
-        searchTerm={
-          initialValue && initialValue.length === 1 ? initialValue : ""
-        }
-        options={[
-          { id: "text", title: "text" },
-          { id: "integer", title: "integer" }
-        ]}
-        onChange={this.onChange}
-        onKeyUp={this.onKeyUp}
-      />
-    );
-  }
-
-  componentDidMount() {
-    setTimeout(() => {
-      ReactDOM.findDOMNode(this.refs.input).children[0].focus();
-    });
-  }
 }
 
 function renderInput({ value, onSaveChange, onCancelChange }) {
   return (
-    <Input
+    <InputEditor
       initialValue={value}
       onSaveChange={onSaveChange}
       onCancelChange={onCancelChange}
     />
   );
-}
-
-class Input extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { value: props.initialValue };
-  }
-
-  onChange = e => {
-    let { onChange } = this.props;
-    let value = e.target.value;
-    this.setState({ value }, () => onChange && onChange(value));
-  };
-
-  onBlur = () => {
-    let { onSaveChange } = this.props;
-    onSaveChange && onSaveChange(this.state.value);
-  };
-
-  onKeyUp = e => {
-    let { onSaveChange, onCancelChange } = this.props;
-    if (e.key === "Enter") {
-      onSaveChange && onSaveChange(this.state.value);
-    } else if (e.key === "Escape") {
-      this.setState(
-        { value: undefined },
-        () => onCancelChange && onCancelChange()
-      );
-    }
-  };
-
-  render() {
-    return (
-      <input
-        ref="input"
-        type="text"
-        style={{
-          border: "none",
-          height: "100%",
-          width: "100%",
-          outline: "none"
-        }}
-        value={this.state.value}
-        onChange={this.onChange}
-        onBlur={this.onBlur}
-        onKeyUp={this.onKeyUp}
-      />
-    );
-  }
-
-  componentDidMount() {
-    setTimeout(() => {
-      this.refs.input.value = this.state.value;
-      this.refs.input.focus();
-    });
-  }
 }
 
 class App extends Component {
