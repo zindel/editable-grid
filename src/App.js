@@ -21,7 +21,20 @@ let newRowTemplateFunc = () => ({ name: "", type: "", required: false });
 let columns = [
   {
     id: "Jo",
-    renderView: props => `Hello ${props.row}`
+    renderView: props => (
+      <div
+        style={{
+          background: "#ccc",
+          height: "100%",
+          width: "100%",
+          baseline: "100%",
+          textAlign: "center"
+        }}
+      >
+        {props.row}
+      </div>
+    ),
+    width: 40
   },
   {
     id: "name",
@@ -102,6 +115,7 @@ class App extends Component {
                   columns={columns}
                   newRowTemplateFunc={newRowTemplateFunc}
                   data={data}
+                  fixedReadOnlyColumnCount={1}
                   fixedColumnCount={2}
                   headerRowCount={1}
                   height={height}

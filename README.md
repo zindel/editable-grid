@@ -1,11 +1,9 @@
 
 TODO:
 
-- non-editable columns and grid focus management
-- decide where static/numeric columns are managed
-- column widths
-- decide on column state - where is it kept
 - style Autocomplete properly
+- validation and validation feedback
+- decide on column state - where is it kept
 
 WISHLIST:
 - add Checkbox editor (?)
@@ -22,5 +20,8 @@ DONE:
 - decide what to do with height calculation
 - refactor editors
 - make focused border look better
+- non-editable columns and grid focus management
+- decide where static/numeric columns are managed
+- column widths
 
 

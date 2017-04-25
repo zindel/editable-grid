@@ -45,6 +45,8 @@ export default class EditableGridBase extends Component {
   };
 
   static defaultProps = {
+    focusStartRow: 0,
+    focusStartColumn: 0,
     fixedColumnCount: 0,
     fixedRowCount: 0,
     style: {}
@@ -56,8 +58,8 @@ export default class EditableGridBase extends Component {
     this.state = {
       scrollLeft: 0,
       scrollTop: 0,
-      focusedCol: 0,
-      focusedRow: props.fixedRowCount,
+      focusedCol: props.focusStartColumn,
+      focusedRow: props.focusStartRow,
       isEditing: false
     };
 
@@ -77,26 +79,16 @@ export default class EditableGridBase extends Component {
     this._rowHeightBottomGrid = this._rowHeightBottomGrid.bind(this);
   }
 
-  onKeyUp = e => {
-    let { isCellEditable } = this.props;
-    let { focusedCol, focusedRow, isEditing } = this.state;
-
-    if (isEditing) {
-      return;
-    }
-
-    if (
-      (e.key === "Enter" || e.key.length === 1) &&
-      isCellEditable(focusedRow, focusedCol)
-    ) {
-      this.startEditing(e.key.length === 1 ? e.key : null);
-    }
-  };
-
   onKeyDown = e => {
     let incRow = 0, incCol = 0;
     let { focusedCol, focusedRow, isEditing } = this.state;
-    let { isCellEditable, fixedRowCount, columnCount, rowCount } = this.props;
+    let {
+      isCellEditable,
+      focusStartRow,
+      focusStartColumn,
+      columnCount,
+      rowCount
+    } = this.props;
 
     if (isEditing) {
       return;
@@ -129,8 +121,12 @@ export default class EditableGridBase extends Component {
 
     this.setState({
       ...this.state,
-      focusedCol: ensureRange(focusedCol + incCol, 0, columnCount - 1),
-      focusedRow: ensureRange(focusedRow + incRow, fixedRowCount, rowCount - 1)
+      focusedCol: ensureRange(
+        focusedCol + incCol,
+        focusStartColumn,
+        columnCount - 1
+      ),
+      focusedRow: ensureRange(focusedRow + incRow, focusStartRow, rowCount - 1)
     });
   };
 
@@ -382,7 +378,7 @@ export default class EditableGridBase extends Component {
   }
 
   _cellRenderer({ key, style, focused, ...rest }) {
-    let { focusedCol, focusedRow, isEditing, initialValue } = this.state;
+    let { isEditing, initialValue } = this.state;
     let { column, row } = rest;
     let children = this.props.cellRenderer({
       ...rest,
@@ -397,13 +393,7 @@ export default class EditableGridBase extends Component {
         this.stopEditing();
       }
     });
-    // if (focused) {
-    //   children = (
-    //     <div style={{ width: "100%", height: "100%", ...FOCUSED_CELL }}>
-    //       {children}
-    //     </div>
-    //   );
-    // }
+
     return (
       <div
         key={key}
@@ -707,7 +697,7 @@ export default class EditableGridBase extends Component {
         }}
         onScroll={this._onScroll}
         rowCount={
-          Math.max(0, rowCount - fixedRowCount) + 1
+          Math.max(0, rowCount - fixedRowCount) + 0
           /*  1  See _rowHeightBottomGrid */
         }
         rowHeight={this._rowHeightBottomGrid}

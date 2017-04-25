@@ -17,10 +17,13 @@ function renderHeaderDefault(cellProps) {
 
 export default class EditableGrid extends React.Component {
   static defaultProps = {
+    defaultColumnWidth: 200,
+    fixedColumnCount: 0,
+    fixedReadOnlyColumnCount: 0,
     rowHeight: 25,
     headerRowCount: 1,
     newRowTemplateFunc: null,
-    autoGrowMaxRows: null,
+    autoGrowMaxRows: null
   };
 
   constructor(props) {
@@ -97,9 +100,11 @@ export default class EditableGrid extends React.Component {
       columns,
       data: initialData,
       style = {},
+      fixedReadOnlyColumnCount,
       fixedColumnCount,
       autoGrowMaxRows,
       rowHeight,
+      defaultColumnWidth,
       height,
       width
     } = this.props;
@@ -118,9 +123,11 @@ export default class EditableGrid extends React.Component {
         height={height}
         width={width}
         style={{ ...STYLE, ...style }}
+        focusStartRow={headerRowCount}
+        focusStartColumn={fixedReadOnlyColumnCount}
         fixedRowCount={headerRowCount}
-        fixedColumnCount={fixedColumnCount}
-        columnWidth={200}
+        fixedColumnCount={Math.max(fixedColumnCount, fixedReadOnlyColumnCount)}
+        columnWidth={({index}) => columns[index].width || defaultColumnWidth}
         columnCount={columns.length}
         rowHeight={rowHeight}
         rowCount={rowCount}
